@@ -48,13 +48,13 @@ ENGINE = InnoDB;
 -- Table `ConsultorioFuboca`.`Consulta`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ConsultorioFuboca`.`Consulta` (
-  `idConsulta` INT NOT NULL,
+  `idConsulta` INT NOT NULL AUTO_INCREMENT,
   `Data` DATE NOT NULL,
   `Hora` TIME NOT NULL,
   `Observação` VARCHAR(80) NULL,
   `Paciente_IdPaciente` INT NOT NULL,
   `Medico_idMedico` INT NOT NULL,
-  PRIMARY KEY (`idConsulta`, `Paciente_IdPaciente`, `Medico_idMedico`),
+  PRIMARY KEY (`idConsulta`),
   INDEX `fk_Consulta_Paciente_idx` (`Paciente_IdPaciente` ASC),
   INDEX `fk_Consulta_Medico1_idx` (`Medico_idMedico` ASC),
   CONSTRAINT `fk_Consulta_Paciente`
@@ -73,3 +73,23 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+SELECT
+  Consulta.idConsulta,
+ 
+  -- Nome completo do paciente
+  CONCAT(Paciente.PrimeiroNomePaciente, ' ',
+         IFNULL(Paciente.NomeDoMeioPaciente, ''), ' ',
+         Paciente.UltimoNomePaciente) AS NomePaciente,
+ 
+  -- Nome completo do médico
+  CONCAT(Medico.PrimeiroNomeMedico, ' ',
+         IFNULL(Medico.NomeDoMeioMedico, ''), ' ',
+         Medico.UltimoNomeMedico) AS NomeMedico,
+
+  Consulta.Data,
+  Consulta.Hora,
+  Consulta.Observação
+FROM Consulta
+JOIN Paciente ON Consulta.Paciente_IdPaciente = Paciente.IdPaciente
+JOIN Medico ON Consulta.Medico_idMedico = Medico.idMedico;
